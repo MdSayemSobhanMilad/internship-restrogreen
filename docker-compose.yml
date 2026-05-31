@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: restrogreen-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: restrogreen_password
+      MYSQL_DATABASE: restrogreen
+      MYSQL_USER: restrogreen
+      MYSQL_PASSWORD: restrogreen_password
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+    networks:
+      - restrogreen-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: restrogreen-app
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - DB_HOST=mysql
+      - DB_USER=root
+      - DB_PASSWORD=restrogreen_password
+      - DB_NAME=restrogreen
+      - DB_PORT=3306
+      - JWT_SECRET=restrogreen_jwt_secret_key_2024
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - restrogreen-network
+
+volumes:
+  mysql_data:
+
+networks:
+  restrogreen-network:
+    driver: bridge

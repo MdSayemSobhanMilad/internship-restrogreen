@@ -1,0 +1,12 @@
+node_modules
+.git
+.gitignore
+.env.local
+.next
+*.md
+.vscode
+.idea
+docker-compose.yml
+Jenkinsfile
+k8s/
+apache/
