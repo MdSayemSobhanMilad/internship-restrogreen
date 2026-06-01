@@ -18,9 +18,16 @@ pipeline {
             }
         }
         
-        stage('Install Dependencies') {
-            steps {
-                sh 'npm ci'
+    stage('Install Dependencies') {
+        steps {
+                script {
+                    try {
+                        sh 'npm ci'
+                    } catch (Exception e) {
+                        echo 'npm ci failed, falling back to npm install'
+                        sh 'npm install'
+                    }
+                }
                 echo 'Dependencies installed'
             }
         }
