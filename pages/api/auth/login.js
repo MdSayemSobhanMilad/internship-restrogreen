@@ -9,35 +9,33 @@ export default async function handler(req, res) {
 
   try {
     const { email, password } = req.body;
-    console.log('Login attempt for:', email);
 
+    // Query the user by email and active status
     const [users] = await pool.execute(
       'SELECT * FROM users WHERE email = ? AND status = ?',
       [email, 'active']
     );
-
-    console.log('Users found:', users.length);
 
     if (users.length === 0) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
     const user = users[0];
-    
-    // Simple direct password check for now
+
+    // Plain text password comparison (no bcrypt)
     if (password !== user.password) {
       console.log('Password mismatch');
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    console.log('Login successful for:', user.role);
-
+    // Generate JWT token
     const token = jwt.sign(
       { id: user.id, name: user.name, email: user.email, role: user.role },
-      process.env.JWT_SECRET || 'restrogreen_secret_key_2024',
+      process.env.JWT_SECRET || 'restrogreen_jwt_secret_key_2024',
       { expiresIn: '24h' }
     );
 
+    // Set cookie
     res.setHeader('Set-Cookie', serialize('token', token, {
       httpOnly: true,
       secure: false,
@@ -46,6 +44,7 @@ export default async function handler(req, res) {
       path: '/'
     }));
 
+    // Return user info
     return res.status(200).json({
       user: {
         id: user.id,
@@ -56,6 +55,6 @@ export default async function handler(req, res) {
     });
   } catch (error) {
     console.error('Login error:', error);
-    return res.status(500).json({ error: 'Server error: ' + error.message });
+    return res.status(500).json({ error: 'Server error' });
   }
 }
