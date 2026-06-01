@@ -1,7 +1,6 @@
 // pages/api/users/manage.js
 import pool from '../../../lib/db';
 import { verifyAuth, requireRole } from '../../../lib/auth';
-import bcrypt from 'bcryptjs';
 
 export default verifyAuth(requireRole('admin')(async function handler(req, res) {
   try {
@@ -10,11 +9,10 @@ export default verifyAuth(requireRole('admin')(async function handler(req, res) 
     if (req.method === 'POST') {
       const { name, email, password, role, salary_per_hour } = req.body;
       
-      const hashedPassword = await bcrypt.hash(password, 10);
-      
+      // Store the password as plain text (no hashing)
       const [result] = await pool.execute(
         'INSERT INTO users (name, email, password, role, salary_per_hour) VALUES (?, ?, ?, ?, ?)',
-        [name, email, hashedPassword, role, salary_per_hour || 0]
+        [name, email, password, role, salary_per_hour || 0]
       );
 
       return res.status(201).json({ 

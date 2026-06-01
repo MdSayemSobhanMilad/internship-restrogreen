@@ -188,4 +188,8 @@ data:
     );
 
     INSERT IGNORE INTO users (name, email, password, role, salary_per_hour) 
-    VALUES ('Admin', 'admin@restrogreen.com', '$2a$10$UAFTSOTOTBMrCy3FDHPer.FBdIH1YHCb7cJri9IdhXHQjv27sqFg6', 'admin', 0.00);
+    VALUES 
+    ('Admin', 'admin@restrogreen.com', 'admin123', 'admin', 0.00),
+    ('Manager', 'manager@restrogreen.com', 'manager123', 'manager', 20.00),
+    ('Waiter', 'waiter@restrogreen.com', 'waiter123', 'waiter', 12.00),
+    ('Chef', 'chef@restrogreen.com', 'chef123', 'chef', 18.00);
