@@ -74,39 +74,37 @@ pipeline {
         }
         
         stage('Deploy to Kubernetes') {
-            steps {
-                script {
-                    withKubeConfig([credentialsId: 'kubeconfig']) {
-                        sh """
-                            kubectl apply -f k8s/namespace.yaml
-                            kubectl apply -f k8s/configmap.yaml
-                            kubectl apply -f k8s/secrets.yaml
-                            kubectl apply -f k8s/mysql-deployment.yaml
-                            
-                            kubectl wait --for=condition=ready pod \
-                                -l app=mysql \
-                                -n ${K8S_NAMESPACE} \
-                                --timeout=500s
-                            
-                            kubectl set image deployment/restrogreen-app \
-                                restrogreen=${DOCKER_HUB_IMAGE}:${BUILD_TAG} \
-                                -n ${K8S_NAMESPACE}
-                            
-                            kubectl apply -f k8s/app-deployment.yaml
-                            
-                            kubectl rollout status deployment/restrogreen-app \
-                                -n ${K8S_NAMESPACE} \
-                                --timeout=120s
-                            
-                            kubectl apply -f k8s/ingress.yaml
-                        """
-                    }
-                }
+    steps {
+        script {
+            withKubeConfig([credentialsId: 'kubeconfig']) {
+                // 1. Clean up old namespace completely
                 sh 'kubectl delete namespace restrogreen --ignore-not-found=true'
-                sleep(20)  // give it time to delete
-                echo 'Deployment to Kubernetes completed'
+                sh 'kubectl wait --for=delete namespace/restrogreen --timeout=60s || true'
+                sleep 10
+
+                // 2. Recreate everything
+                sh '''
+                    kubectl apply -f k8s/namespace.yaml
+                    kubectl apply -f k8s/configmap.yaml
+                    kubectl apply -f k8s/secrets.yaml
+                    kubectl apply -f k8s/mysql-deployment.yaml
+                '''
+
+                // 3. Wait for MySQL (only one pod because of Recreate)
+                sh "kubectl wait --for=condition=ready pod -l app=mysql -n ${K8S_NAMESPACE} --timeout=300s"
+
+                // 4. Deploy the application
+                sh """
+                    kubectl apply -f k8s/app-deployment.yaml
+                    kubectl set image deployment/restrogreen-app restrogreen=${DOCKER_HUB_IMAGE}:${BUILD_TAG} -n ${K8S_NAMESPACE}
+                    kubectl rollout status deployment/restrogreen-app -n ${K8S_NAMESPACE} --timeout=120s
+                    kubectl apply -f k8s/ingress.yaml
+                """
             }
         }
+        echo 'Deployment to Kubernetes completed'
+    }
+}
     }
     
     post {
