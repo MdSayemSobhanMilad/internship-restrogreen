@@ -37,13 +37,6 @@ spec:
               key: DB_PASSWORD
         - name: MYSQL_DATABASE
           value: restrogreen
-        - name: MYSQL_USER
-          value: restrogreen
-        - name: MYSQL_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: restrogreen-secrets
-              key: DB_PASSWORD
         ports:
         - containerPort: 3306
           name: mysql

@@ -9,4 +9,3 @@ data:
   DB_NAME: "restrogreen"
   DB_PORT: "3306"
   JWT_SECRET: "restrogreen_jwt_secret_key_2024"
-  NEXT_PUBLIC_API_URL: "http://restrogreen.example.com"

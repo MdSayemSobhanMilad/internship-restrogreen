@@ -7,13 +7,8 @@ metadata:
     nginx.ingress.kubernetes.io/rewrite-target: /
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
     nginx.ingress.kubernetes.io/proxy-body-size: "10m"
-    cert-manager.io/cluster-issuer: "letsencrypt-prod"
 spec:
   ingressClassName: nginx
-  tls:
-  - hosts:
-    - restrogreen.example.com
-    secretName: restrogreen-tls
   rules:
   - host: restrogreen.example.com
     http:
@@ -25,4 +20,3 @@ spec:
             name: restrogreen-service
             port:
               number: 80
-              

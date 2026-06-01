@@ -52,3 +52,9 @@ ENV JWT_SECRET=restrogreen_jwt_secret_key_2024
 
 # Start the application
 CMD ["node", "server.js"]
+
+# Labels
+LABEL maintainer="sayemsobhanmilad"
+LABEL description="RestroGreen - Restaurant Management System"
+LABEL version="1.0"
+LABEL repository="https://github.com/MdSayemSobhanMilad/internship-restrogreen"
