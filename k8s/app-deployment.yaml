@@ -52,10 +52,10 @@ metadata:
   name: restrogreen-service
   namespace: restrogreen
 spec:
+  type: NodePort                  # <-- change
   selector:
     app: restrogreen
   ports:
   - port: 80
     targetPort: 3000
-    name: http
-  type: ClusterIP
+    nodePort: 32214               # <-- fixed port (range 30000-32767)
