@@ -9,6 +9,12 @@ pipeline {
         K8S_NAMESPACE = 'restrogreen'
         BUILD_TAG = "${BUILD_NUMBER}"
     }
+
+    stage('Check Node Version') {
+        steps {
+            sh 'node -v && npm -v'
+        }
+    }
     
     stages {
         stage('Checkout') {
