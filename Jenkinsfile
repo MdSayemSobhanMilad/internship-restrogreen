@@ -86,7 +86,7 @@ pipeline {
                             kubectl wait --for=condition=ready pod \
                                 -l app=mysql \
                                 -n ${K8S_NAMESPACE} \
-                                --timeout=120s
+                                --timeout=500s
                             
                             kubectl set image deployment/restrogreen-app \
                                 restrogreen=${DOCKER_HUB_IMAGE}:${BUILD_TAG} \
