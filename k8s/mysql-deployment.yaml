@@ -47,24 +47,24 @@ spec:
           mountPath: /var/lib/mysql
         - name: init-sql
           mountPath: /docker-entrypoint-initdb.d
-        livenessProbe:
+          livenessProbe:
           exec:
             command:
             - mysqladmin
             - ping
             - -h
-            - 127.0.0.1           # TCP probe
-          initialDelaySeconds: 30
+            - 127.0.0.1
+          initialDelaySeconds: 90      # was 30, now 90
           periodSeconds: 10
         readinessProbe:
           exec:
             command:
             - mysql
             - -h
-            - 127.0.0.1           # TCP probe
+            - 127.0.0.1
             - -e
             - "SELECT 1"
-          initialDelaySeconds: 10
+          initialDelaySeconds: 60      # was 10, now 60
           periodSeconds: 5
       volumes:
       - name: mysql-persistent-storage
