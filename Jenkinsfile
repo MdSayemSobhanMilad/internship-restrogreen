@@ -9,29 +9,27 @@ pipeline {
         K8S_NAMESPACE = 'restrogreen'
         BUILD_TAG = "${BUILD_NUMBER}"
     }
-
-    stage('Check Node Version') {
-        steps {
-            sh 'node -v && npm -v'
-        }
-    }
     
     stages {
+        stage('Check Node Version') {
+            steps {
+                sh 'node -v && npm -v'
+            }
+        }
+        
         stage('Checkout') {
             steps {
                 git branch: "${GIT_BRANCH}", url: "${GIT_REPO}"
-                echo "Code checked out from GitHub successfully"
+                echo 'Code checked out from GitHub successfully'
             }
         }
         
         stage('Install Dependencies') {
             steps {
                 script {
-            // Clean any stale cache
-                    sh 'npm cache clean --force'
-            // Remove existing node_modules and lockfile (they are from repo)
+                    // Remove any leftover artifacts
                     sh 'rm -rf node_modules package-lock.json'
-            // Install fresh
+                    // Fresh install – this will generate a compatible lockfile
                     sh 'npm install'
                 }
                 echo 'Dependencies installed'
@@ -50,7 +48,7 @@ pipeline {
                 script {
                     echo "Building Docker image: ${DOCKER_HUB_IMAGE}:${BUILD_TAG}"
                     sh "docker build -t ${DOCKER_HUB_IMAGE}:${BUILD_TAG} -t ${DOCKER_HUB_IMAGE}:latest -f Dockerfile ."
-                    echo "Docker image built successfully"
+                    echo 'Docker image built successfully'
                 }
             }
         }
@@ -58,7 +56,6 @@ pipeline {
         stage('Push to Docker Hub') {
             steps {
                 script {
-                    // Use Jenkins credentials stored with ID 'docker-hub-credentials'
                     withCredentials([usernamePassword(
                         credentialsId: 'docker-hub-credentials',
                         usernameVariable: 'DOCKER_USER',
@@ -71,8 +68,8 @@ pipeline {
                             docker logout
                         """
                     }
-                    echo 'Docker image pushed to Docker Hub'
                 }
+                echo 'Docker image pushed to Docker Hub'
             }
         }
         
