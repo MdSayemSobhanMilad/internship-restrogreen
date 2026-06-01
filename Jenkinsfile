@@ -102,6 +102,8 @@ pipeline {
                         """
                     }
                 }
+                sh 'kubectl delete namespace restrogreen --ignore-not-found=true'
+                sleep(20)  // give it time to delete
                 echo 'Deployment to Kubernetes completed'
             }
         }
