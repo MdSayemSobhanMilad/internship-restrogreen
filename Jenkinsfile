@@ -24,15 +24,15 @@ pipeline {
             }
         }
         
-    stage('Install Dependencies') {
-        steps {
+        stage('Install Dependencies') {
+            steps {
                 script {
-                    try {
-                        sh 'npm ci'
-                    } catch (Exception e) {
-                        echo 'npm ci failed, falling back to npm install'
-                        sh 'npm install'
-                    }
+            // Clean any stale cache
+                    sh 'npm cache clean --force'
+            // Remove existing node_modules and lockfile (they are from repo)
+                    sh 'rm -rf node_modules package-lock.json'
+            // Install fresh
+                    sh 'npm install'
                 }
                 echo 'Dependencies installed'
             }
