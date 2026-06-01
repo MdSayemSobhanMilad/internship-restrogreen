@@ -51,7 +51,7 @@ spec:
             - mysqladmin
             - ping
             - -h
-            - localhost
+            - 127.0.0.1           # TCP probe
           initialDelaySeconds: 30
           periodSeconds: 10
         readinessProbe:
@@ -59,7 +59,7 @@ spec:
             command:
             - mysql
             - -h
-            - localhost
+            - 127.0.0.1           # TCP probe
             - -e
             - "SELECT 1"
           initialDelaySeconds: 10
