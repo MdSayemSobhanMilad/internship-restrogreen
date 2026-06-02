@@ -69,22 +69,53 @@ export default function WaiterDashboard() {
 
   const totalAmount = items.reduce(function(sum, item) { return sum + (item.quantity * item.price); }, 0);
 
-  const handleSubmitOrder = async function(e) {
+  const handleSubmitOrder = async (e) => {
     e.preventDefault();
-    const res = await fetch('/api/orders/create', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ table_number: parseInt(tableNumber), items, notes }),
-    });
-    if (res.ok) {
-      const data = await res.json();
-      setMessage('Order #' + data.orderId + ' sent to chef!');
-      setTableNumber('');
-      setItems([{ item_name: '', quantity: 1, price: 0 }]);
-      setNotes('');
-      fetchMyOrders();
+
+    // Validate input before sending
+    if (!tableNumber || isNaN(parseInt(tableNumber))) {
+        setMessage('Please enter a valid table number.');
+        return;
     }
-  };
+
+    const validItems = items.filter(i => i.item_name.trim() !== '' && i.quantity > 0 && i.price >= 0);
+    if (validItems.length === 0) {
+        setMessage('Please add at least one valid item with name, quantity and price.');
+        return;
+    }
+
+    // If some items were empty, clean them up
+    if (validItems.length !== items.length) {
+        setItems(validItems);
+    }
+
+    try {
+        const res = await fetch('/api/orders/create', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                table_number: parseInt(tableNumber),
+                items: validItems,
+                notes
+            }),
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+            setMessage(`Order #${data.orderId} sent to chef!`);
+            setTableNumber('');
+            setItems([{ item_name: '', quantity: 1, price: 0 }]);
+            setNotes('');
+            fetchMyOrders();
+        } else {
+            // Show server error message
+            setMessage(`Error: ${data.error || 'Failed to create order'}`);
+        }
+    } catch (error) {
+        setMessage('Network error – could not reach the server.');
+    }
+};
 
   const handleMarkServed = async function(orderId) {
     await fetch('/api/orders/update-status', {
