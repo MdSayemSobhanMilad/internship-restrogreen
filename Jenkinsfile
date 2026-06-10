@@ -75,32 +75,22 @@ pipeline {
 
         // ⭐ NEW: Ensure Minikube is running before deployment
         stage('Start Minikube') {
-          steps {
-            script {
-                sh '''
-                # Fix permissions on .minikube directory
-                    if [ -d "$HOME/.minikube" ]; then
-                        sudo chown -R $USER $HOME/.minikube
-                        chmod -R u+wrx $HOME/.minikube
-                    fi
-
-                    # Delete existing cluster if it is broken
-                    if minikube status &>/dev/null; then
-                        echo "Minikube is already running. Skipping delete."
-                    else
-                        echo "Deleting previous Minikube cluster to avoid permission conflicts..."
-                        minikube delete --purge || true
-                    fi
-
-                    # Start Minikube with Docker driver
-                    minikube start --driver=docker --wait=all
-
-                    # Verify connectivity
-                    kubectl get nodes
-                '''
+            steps {
+                script {
+                    sh '''
+                        if minikube status | grep -q "host: Running"; then
+                            echo "Minikube is already running."
+                        else
+                            echo "Starting Minikube..."
+                            minikube start --driver=docker --wait=all
+                            echo "Minikube started successfully."
+                        fi
+                        # Verify kubectl connectivity
+                        kubectl get nodes
+                    '''
+                }
             }
-          }
-        }   
+        }
         
         stage('Deploy to Kubernetes') {
             steps {
