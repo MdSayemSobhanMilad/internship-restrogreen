@@ -151,7 +151,7 @@ export default function Login() {
               </label>
               <input
                 type="password"
-                placeholder="Enter your password"
+                placeholder="Enter your secrete password"
                 value={password}
                 onChange={function(e) { setPassword(e.target.value); }}
                 required
