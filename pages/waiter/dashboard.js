@@ -192,7 +192,7 @@ export default function WaiterDashboard() {
                 <h5 style={{ color: '#2E7D32', marginBottom: 20 }}>Create New Order</h5>
                 <form onSubmit={handleSubmitOrder}>
                   <div style={{ marginBottom: 16 }}>
-                    <label style={{ fontWeight: 500, display: 'block', marginBottom: 6 }}>Table Number</label>
+                    <label style={{ fontWeight: 500, display: 'block', marginBottom: 6 }}>Table No.</label>
                     <input type="number" required min="1" value={tableNumber} onChange={function(e) { setTableNumber(e.target.value); }} style={{...s.input, maxWidth: 200 }} placeholder="Table #" />
                   </div>
                   <label style={{ fontWeight: 500, display: 'block', marginBottom: 8 }}>Order Items</label>
